@@ -31,11 +31,12 @@ var init = function() {
 
         mesh.position.set(0,0, i);
 
-        if ( i === 3 || i === 4 || i === 7) {
-            textGroup.add(mesh);
-        } else {
-            scene.add(mesh);
-        }
+        textGroup.add(mesh);
+        // if ( i === 3 || i === 4 || i === 7) {
+        //     textGroup.add(mesh);
+        // } else {
+        //     scene.add(mesh);
+        // }
     }
 
     threeImg.push(textGroup);
@@ -61,8 +62,8 @@ var init = function() {
     controls.autoRotateSpeed = 1;
     controls.maxPolarAngle = Math.PI/2;
     // controls.minPolarAngle = 0;
-    controls.maxAzimuthAngle = Math.PI/12;
-    controls.minAzimuthAngle = -Math.PI/12;
+    controls.maxAzimuthAngle = Math.PI/20;
+    controls.minAzimuthAngle = -Math.PI/20;
     controls.minDistance = 100;
     controls.maxDistance = 100;
     controls.enablePan = false;
@@ -80,14 +81,29 @@ var init = function() {
 
 };
 
+// function onMouseWheel(e) {
+//     console.log(e.deltaY);
+//     if (e.deltaY > 0 && threeImg[0].position.y >= -45) {
+//         threeImg[0].position.y -= 5;
+//     } else if (e.deltaY < 0 && threeImg[0].position.y <= 0) {
+//         threeImg[0].position.y += 5;
+//     }
+// }
 function onMouseWheel(e) {
-    console.log(e.deltaY);
-    if (e.deltaY > 0 && threeImg[0].position.y >= -45) {
-        threeImg[0].position.y -= 5;
-    } else if (e.deltaY < 0 && threeImg[0].position.y <= 0) {
-        threeImg[0].position.y += 5;
+
+    if (e.deltaY > 0 && threeImg[0].children[3].position.y >= -45) {
+
+        threeImg[0].children.forEach((v,k) => {
+            v.position.y -= (0.1+(k/4));
+        });
+    } else if (e.deltaY < 0 && threeImg[0].children[3].position.y <= 0) {
+
+        threeImg[0].children.forEach((v,k) => {
+            v.position.y += (0.1+(k/4));
+        });
     }
 }
+
 
 function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
