@@ -2,25 +2,45 @@ var THREE = window.THREE = require('three');
 var OrbitControls = require('three-orbit-controls')(THREE);
 
 var scene = new THREE.Scene(),
-    loader = new THREE.TextureLoader(),
+    imgLoader = new THREE.TextureLoader(),
+    fontLoader = new THREE.FontLoader(),
     textGroup = new THREE.Group(),
+    text1 = 'Infinite',
     camera,
     light,
     mouse,
     center,
     renderer;
 
-
 var init = function() {
+    fontLoader.load( 'src/fonts/criteria-thin.json', function (font) {
+        var textGeometry = new THREE.TextGeometry( text1, {
+            font: font,
+            size: 10,
+            height: 0,
+            curveSegments: 20,
+            // bevelEnabled: true,
+            // bevelThickness: 0,
+            // bevelSize: 0,
+            // bevelOffset: 0,
+            // bevelSegments: 0
+        });
+
+        var textMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff});
+
+        var mesh = new THREE.Mesh( textGeometry, textMaterial);
+        mesh.position.set(-100,30,3);
+        scene.add(mesh);
+     })
 
     for ( var i = 9; i>=1; i--) {
         if (i === 1) {
             material = new THREE.MeshLambertMaterial({
-                map: loader.load('src/img/layer-0' + i + '.jpg')
+                map: imgLoader.load('src/img/layer-0' + i + '.jpg')
             });
         } else {
             var material = new THREE.MeshLambertMaterial({
-                map: loader.load('src/img/layer-0' + i + '.png')
+                map: imgLoader.load('src/img/layer-0' + i + '.png')
             });
         }
 
@@ -42,7 +62,7 @@ var init = function() {
     threeImg.push(textGroup);
     scene.add(textGroup);
 
-    light = new THREE.PointLight(0xffffff, 1,1000, 0.5);
+    light = new THREE.PointLight(0xffffff, 1,1000, 0);
     light.position.set(1,1,100);
     scene.add(light);
 
