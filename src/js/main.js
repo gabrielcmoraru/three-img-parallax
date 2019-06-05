@@ -31,9 +31,36 @@ var init = function() {
         var mesh = new THREE.Mesh( textGeometry, textMaterial);
         mesh.position.set(-100,30,3);
         scene.add(mesh);
-     })
+    });
 
-    for ( var i = 9; i>=1; i--) {
+    imgLoader.load("src/img/cloud.png", function(texture){
+        var cloudGeo = new THREE.PlaneBufferGeometry(50,50);
+        var cloudMaterial = new THREE.MeshLambertMaterial({
+            map: texture,
+            transparent: true
+        });
+        for(let p=0; p<10; p++) {
+            let cloud = new THREE.Mesh(cloudGeo,cloudMaterial);
+            cloud.position.set(
+            Math.random()*300 -100,
+            80,
+            -5-p
+            );
+            cloud.rotation.x = 1.16;
+            cloud.rotation.y = -0.12;
+            cloud.rotation.z = Math.random()*360;
+            cloud.material.opacity = 0.5;
+            scene.add(cloud);
+            cloudParticles.push(cloud);
+        }
+    });
+
+    var flash = new THREE.PointLight(0xffffff, 30, 500 ,1.7);
+    flash.position.set(200,300,300);
+    scene.add(flash);
+    flashObj.push(flash);
+
+    for ( var i = 9; i>=2; i--) {
         if (i === 1) {
             material = new THREE.MeshLambertMaterial({
                 map: imgLoader.load('src/img/layer-0' + i + '.jpg')
@@ -98,7 +125,6 @@ var init = function() {
     document.body.appendChild(renderer.domElement);
     window.addEventListener( 'resize', onWindowResize, false );
     document.addEventListener( 'wheel', onMouseWheel, false);
-
 };
 
 // function onMouseWheel(e) {
@@ -133,6 +159,23 @@ function onWindowResize() {
 
 // main animation loop - calls 50-60 times per second.
 var mainLoop = function() {
+    function animate() {
+        cloudParticles.forEach(p => {
+          p.rotation.z -=0.001;
+          p.rotation.x -=0.001;
+          if(Math.random() > 0.93 || flashObj[0].power > 100) {
+              if(flashObj[0].power < 100)
+                flashObj[0].position.set(
+                  Math.random()*400,
+                  300 + Math.random() *200,
+                  100
+                );
+              flashObj[0].power = 50 + Math.random() * 500;
+
+      }
+        });
+    }
+    animate();
     threeObj[0].update();
     // threeImg[0].position.y = threeObj[0].getPolarAngle ();
     // console.log(threeObj[0].getPolarAngle ());
