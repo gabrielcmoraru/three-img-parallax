@@ -13,12 +13,16 @@ var parallaxHeader = {
         textGroup: new THREE.Group(),
         camera: new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000),
         renderer: new THREE.WebGLRenderer({alpha: true, antialias: true}),
+        cloudTexture: "src/img/cloud.png",
         textFont: 'src/fonts/criteria-thin.json',
         textFont2: 'src/fonts/flexo.json',
         textFont3: 'src/fonts/criteria-bold.json',
         text1: 'Infinite',
         text2: 'entertainment',
         text3: 'Synamedia'
+    },
+    minMax: function (min, max) {
+        return Math.random() * (max - min) + min;
     },
     fontLoad: function (textFont, textContent, size, posX, posY, posZ) {
         var $that = this;
@@ -42,16 +46,13 @@ var parallaxHeader = {
     },
     imagesLoad: function () {
         for ( var i = 9; i>=2; i--) {
-            if (i === 1) {
-                material = new THREE.MeshLambertMaterial({
-                    map: this.vars.imgLoader.load('src/img/layer-0' + i + '.jpg')
-                });
-            } else {
-                var material = new THREE.MeshLambertMaterial({
-                    map: this.vars.imgLoader.load('src/img/layer-0' + i + '.png')
-                });
-            }
-            var geometry = new THREE.PlaneGeometry(280 +(i*1.8) , 200 +(i*1.8) , 20, 20);
+            if( i === 7 ) { i-- };//replaced with 3d text
+            if( i === 4 ) { i-- };//replaced with 3d text
+            if( i === 3 ) { i-- };//replaced with 3d text
+            var material = new THREE.MeshLambertMaterial({
+                map: this.vars.imgLoader.load('src/img/layer-0' + i + '.png')
+            });
+            var geometry = new THREE.PlaneGeometry(280 +(i*1.8) , 200 +(i*1.8) , 30, 30);
             var mesh = new THREE.Mesh(geometry, material);
             mesh.material.transparent = true;
             mesh.position.set(0,0, i);
@@ -60,10 +61,10 @@ var parallaxHeader = {
             this.vars.threeImg.push(mesh);
         }
     },
-    cloudLoad: function () {
+    cloudLoad: function (cloudTexture, sizeMin, sizeMax) {
         var $that = this;
-        this.vars.imgLoader.load("src/img/cloud.png", function(texture){
-            var cloudGeo = new THREE.PlaneBufferGeometry(Math.random()*300, Math.random()*300);
+        this.vars.imgLoader.load(cloudTexture, function(texture){
+            var cloudGeo = new THREE.PlaneBufferGeometry($that.minMax(sizeMin, sizeMax), $that.minMax(sizeMin, sizeMax));
             var cloudMaterial = new THREE.MeshLambertMaterial({
                 map: texture,
                 transparent: true
@@ -73,7 +74,7 @@ var parallaxHeader = {
                 cloud.position.set(Math.random()*300-100, 80, -p);
                 // cloud.rotation.x = Math.random()*100;
                 // cloud.rotation.y = Math.random()*360;
-                // cloud.rotation.z = Math.random()*360;
+                cloud.rotation.z = Math.random()*360;
                 cloud.material.opacity = 0.5;
                 $that.vars.scene.add(cloud);
                 $that.vars.cloudParticles.push(cloud);
@@ -137,14 +138,21 @@ var parallaxHeader = {
         document.body.appendChild(this.vars.renderer.domElement);
     },
     moveClouds: function() {
-        this.vars.cloudParticles.forEach(p => {
-        p.position.x -=0.01;
+        this.vars.cloudParticles.forEach(cloud => {
+        cloud.position.x -= 0.06;
+        if (cloud.position.x < -200) {
+            cloud.rotation.z = Math.random()*360;
+            cloud.position.x = 200;
+        }
+        console.log(cloud.position.x)
+        });
+    },
+    callThunder: function () {
         if( Math.random() > 0.93 || this.vars.flashObj[0].power > 100 ) {
             if( this.vars.flashObj[0].power < 100 )
                 this.vars.flashObj[0].position.set( Math.random()*400, 300 + Math.random() *200, 100 );
                 this.vars.flashObj[0].power = 50 + Math.random() * 500;
             }
-        });
     },
     mainLoop: function() {
         parallaxHeader.moveClouds();
@@ -163,10 +171,10 @@ var parallaxHeader = {
         this.lightPoint(0xffffff, 1, 1000, 0, 1, 1, 100);
         this.lightThunder(0xffffff, 30, 500, 1.7, 0, 0, 0);
         this.imagesLoad();
-        this.fontLoad(this.vars.textFont2, this.vars.text1, 9, -100, 30, 3);
-        this.fontLoad(this.vars.textFont2, this.vars.text2, 9, 22, 12, 6);
+        this.fontLoad(this.vars.textFont2, this.vars.text1, 9, -100, 30, 7);
+        this.fontLoad(this.vars.textFont2, this.vars.text2, 9, 22, 13, 6);
         this.fontLoad(this.vars.textFont2, this.vars.text3, 11, -37, 50, 3);
-        this.cloudLoad();
+        this.cloudLoad(this.vars.cloudTexture, 50, 100);
         this.evenListeners();
         console.log(this.vars.threeImg)
         console.log(this.vars.threeObj)
