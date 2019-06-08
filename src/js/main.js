@@ -5,6 +5,7 @@ var parallaxHeader = {
     vars: {
         threeObj: [],
         threeImg: [],
+        threeTxt: [],
         cloudParticles: [],
         flashObj: [],
         scene: new THREE.Scene(),
@@ -41,8 +42,10 @@ var parallaxHeader = {
             var textMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff});
             var mesh = new THREE.Mesh( textGeometry, textMaterial);
             mesh.position.set(posX,posY,posZ);
-            $that.vars.scene.add(mesh);
+            $that.vars.textGroup.add(mesh);
         });
+        this.vars.scene.add(this.vars.textGroup);
+        this.vars.threeTxt.push(this.vars.textGroup);
     },
     imagesLoad: function () {
         for ( var i = 9; i>=2; i--) {
@@ -82,11 +85,17 @@ var parallaxHeader = {
         });
     },
     onMouseWheel: function (e) {
-        if (e.deltaY > 0 && parallaxHeader.vars.threeImg[3].position.y >= -45) {
+        if (e.deltaY > 0 && parallaxHeader.vars.threeImg[3].position.y >= -30) {
+            parallaxHeader.vars.threeTxt[0].children[0].position.y -= 0.8;
+            parallaxHeader.vars.threeTxt[0].children[1].position.y -= 0.3;
+            parallaxHeader.vars.threeTxt[0].children[2].position.y -= 0.9;
             parallaxHeader.vars.threeImg.forEach((v,k) => {
                 v.position.y -= (0.1+(k/4));
             });
         } else if (e.deltaY < 0 && parallaxHeader.vars.threeImg[3].position.y <= 0) {
+            parallaxHeader.vars.threeTxt[0].children[0].position.y += 0.8;
+            parallaxHeader.vars.threeTxt[0].children[1].position.y += 0.3;
+            parallaxHeader.vars.threeTxt[0].children[2].position.y += 0.9;
             parallaxHeader.vars.threeImg.forEach((v,k) => {
                 v.position.y += (0.1+(k/4));
             });
@@ -144,7 +153,6 @@ var parallaxHeader = {
             cloud.rotation.z = Math.random()*360;
             cloud.position.x = 200;
         }
-        console.log(cloud.position.x)
         });
     },
     callThunder: function () {
@@ -171,9 +179,9 @@ var parallaxHeader = {
         this.lightPoint(0xffffff, 1, 1000, 0, 1, 1, 100);
         this.lightThunder(0xffffff, 30, 500, 1.7, 0, 0, 0);
         this.imagesLoad();
-        this.fontLoad(this.vars.textFont2, this.vars.text1, 9, -100, 30, 7);
+        this.fontLoad(this.vars.textFont2, this.vars.text1, 9, -100, 30, 3);
         this.fontLoad(this.vars.textFont2, this.vars.text2, 9, 22, 13, 6);
-        this.fontLoad(this.vars.textFont2, this.vars.text3, 11, -37, 50, 3);
+        this.fontLoad(this.vars.textFont2, this.vars.text3, 11, -37, 50, 2);
         this.cloudLoad(this.vars.cloudTexture, 50, 100);
         this.evenListeners();
         console.log(this.vars.threeImg)
