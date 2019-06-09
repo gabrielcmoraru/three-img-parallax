@@ -1,4 +1,5 @@
 var THREE = window.THREE = require('three');
+var Stats = require('stats-js');
 // var OrbitControls = require('three-orbit-controls')(THREE);
 
 var parallaxHeader = {
@@ -16,6 +17,7 @@ var parallaxHeader = {
         renderer: new THREE.WebGLRenderer({alpha: true, antialias: true}),
         mouseTolerance: 0.02,
         thundeTime: 0,
+        fps: new Stats(),
         cloudTexture: "src/img/cloud.png",
         textFont: 'src/fonts/criteria-thin.json',
         textFont2: 'src/fonts/flexo.json',
@@ -23,6 +25,10 @@ var parallaxHeader = {
         text1: 'Infinite',
         text2: 'entertainment',
         text3: 'Synamedia'
+    },
+    showFPS: function () {
+        this.vars.fps.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
+        document.body.appendChild( this.vars.fps.dom );
     },
     minMax: function (min, max) {
         return Math.random() * (max - min) + min;
@@ -209,6 +215,7 @@ var parallaxHeader = {
         }
     },
     mainLoop: function() {
+        parallaxHeader.vars.fps.update();
         parallaxHeader.moveClouds();
         parallaxHeader.vars.renderer.render(parallaxHeader.vars.scene, parallaxHeader.vars.camera);
         requestAnimationFrame(parallaxHeader.mainLoop);
@@ -234,6 +241,7 @@ var parallaxHeader = {
         this.fontLoad(this.vars.textFont2, this.vars.text3, 11, -37, 50, 2);
         this.cloudLoad(this.vars.cloudTexture, 50, 100);
         this.evenListeners();
+        this.showFPS();
         console.log(this.vars.threeImg)
         console.log(this.vars.threeObj)
     }
