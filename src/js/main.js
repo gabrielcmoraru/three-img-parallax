@@ -140,7 +140,6 @@ var parallaxHeader = {
         var intersects = raycaster.intersectObjects( parallaxHeader.vars.scene.children );
         if ( intersects.length > 0 ) {
             parallaxHeader.vars.thundeTime = 20;
-            console.log(intersects[0].object);
         }
     },
     onWindowResize: function () {
@@ -202,7 +201,6 @@ var parallaxHeader = {
         });
     },
     callThunder: function () {
-        // console.log(this.vars.flashObj[0].power)
         this.vars.flashObj[0].position.set( this.minMax(50, 400), this.minMax(300, 600), 100 );
         this.vars.flashObj[0].power = this.minMax(100, 1000);
         if( this.vars.thundeTime <= 1 ) {
