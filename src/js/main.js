@@ -134,12 +134,12 @@ var parallaxHeader = {
             txt.rotation.x = (e.clientY - centerY) / centerY * parallaxHeader.vars.mouseTolerance;
         })
 
-        parallaxHeader.vars.cloudParticles.forEach( cloud => {
-            cloud.rotation.y = (e.clientX - centerX) / centerX * parallaxHeader.vars.mouseTolerance;
-        })
-        parallaxHeader.vars.cloudParticles.forEach( cloud => {
-            cloud.rotation.x = (e.clientY - centerY) / centerY * parallaxHeader.vars.mouseTolerance;
-        })
+        // parallaxHeader.vars.cloudParticles.forEach( cloud => {
+        //     cloud.rotation.y = (e.clientX - centerX) / centerX * parallaxHeader.vars.mouseTolerance;
+        // })
+        // parallaxHeader.vars.cloudParticles.forEach( cloud => {
+        //     cloud.rotation.x = (e.clientY - centerY) / centerY * parallaxHeader.vars.mouseTolerance;
+        // })
 
     },
     onMouseClick: function (e) {
