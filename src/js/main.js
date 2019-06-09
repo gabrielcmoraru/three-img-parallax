@@ -14,6 +14,7 @@ var parallaxHeader = {
         textGroup: new THREE.Group(),
         camera: new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000),
         renderer: new THREE.WebGLRenderer({alpha: true, antialias: true}),
+        mouseTolerance: 0.02,
         cloudTexture: "src/img/cloud.png",
         textFont: 'src/fonts/criteria-thin.json',
         textFont2: 'src/fonts/flexo.json',
@@ -55,10 +56,10 @@ var parallaxHeader = {
             var material = new THREE.MeshLambertMaterial({
                 map: this.vars.imgLoader.load('src/img/layer-0' + i + '.png')
             });
-            var geometry = new THREE.PlaneGeometry(280 +(i*1.8) , 200 +(i*1.8) , 30, 30);
+            var geometry = new THREE.PlaneGeometry(280 +(i*3) , 200 +(i*3) , 30, 30);
             var mesh = new THREE.Mesh(geometry, material);
             mesh.material.transparent = true;
-            mesh.position.set(0,0, i);
+            mesh.position.set(0,0,i);
             this.vars.textGroup.add(mesh);
             this.vars.scene.add(mesh);
             this.vars.threeImg.push(mesh);
@@ -74,7 +75,7 @@ var parallaxHeader = {
             });
             for(let p=0; p<10; p++) {
                 let cloud = new THREE.Mesh(cloudGeo,cloudMaterial);
-                cloud.position.set(Math.random()*300-100, 80, -p);
+                cloud.position.set((Math.random()*300-100), 80, (-p-50));
                 // cloud.rotation.x = Math.random()*100;
                 // cloud.rotation.y = Math.random()*360;
                 cloud.rotation.z = Math.random()*360;
@@ -86,20 +87,44 @@ var parallaxHeader = {
     },
     onMouseWheel: function (e) {
         if (e.deltaY > 0 && parallaxHeader.vars.threeImg[3].position.y >= -30) {
-            parallaxHeader.vars.threeTxt[0].children[0].position.y -= 0.8;
-            parallaxHeader.vars.threeTxt[0].children[1].position.y -= 0.3;
+            parallaxHeader.vars.threeTxt[0].children[0].position.y -= 0.9;
+            parallaxHeader.vars.threeTxt[0].children[1].position.y -= 0.5;
             parallaxHeader.vars.threeTxt[0].children[2].position.y -= 0.9;
             parallaxHeader.vars.threeImg.forEach((v,k) => {
                 v.position.y -= (0.1+(k/4));
             });
         } else if (e.deltaY < 0 && parallaxHeader.vars.threeImg[3].position.y <= 0) {
-            parallaxHeader.vars.threeTxt[0].children[0].position.y += 0.8;
-            parallaxHeader.vars.threeTxt[0].children[1].position.y += 0.3;
+            parallaxHeader.vars.threeTxt[0].children[0].position.y += 0.9;
+            parallaxHeader.vars.threeTxt[0].children[1].position.y += 0.5;
             parallaxHeader.vars.threeTxt[0].children[2].position.y += 0.9;
             parallaxHeader.vars.threeImg.forEach((v,k) => {
                 v.position.y += (0.1+(k/4));
             });
         }
+    },
+    onMouseMove: function (e) {
+        var centerX = window.innerWidth * 0.5;
+        var centerY = window.innerHeight * 0.5;
+
+        parallaxHeader.vars.threeImg.forEach( img => {
+            img.rotation.y = (e.clientX - centerX) / centerX * parallaxHeader.vars.mouseTolerance;
+        })
+        parallaxHeader.vars.threeImg.forEach( img => {
+            img.rotation.x = (e.clientY - centerY) / centerY * parallaxHeader.vars.mouseTolerance;
+        })
+
+        parallaxHeader.vars.threeTxt.forEach( txt => {
+            txt.rotation.y = (e.clientX - centerX) / centerX * parallaxHeader.vars.mouseTolerance;
+        })
+        parallaxHeader.vars.threeTxt.forEach( txt => {
+            txt.rotation.x = (e.clientY - centerY) / centerY * parallaxHeader.vars.mouseTolerance;
+        })
+    },
+    mobileTilt: function (e) {
+        console.log(e)
+        update('x', e.beta);
+        update('y', e.gamma);
+        update('z', e.alpha ? 360 - e.alpha : null);
     },
     onWindowResize: function () {
         parallaxHeader.vars.camera.aspect = window.innerWidth / window.innerHeight;
@@ -109,26 +134,26 @@ var parallaxHeader = {
     cameraInit: function () {
         // create an locate the camera
         // camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        var controls = new OrbitControls( this.vars.camera );
+        // var controls = new OrbitControls( this.vars.camera );
 
         this.vars.camera.position.z = 100;
         // this.vars.camera.position.set(140, 120, -140);
         // center = new THREE.Vector3();
         // center.z = -50;
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.9;
-        controls.autoRotate = false;
-        controls.autoRotateSpeed = 1;
-        controls.maxPolarAngle = Math.PI/2;
+        // controls.enableDamping = true;
+        // controls.dampingFactor = 0.9;
+        // controls.autoRotate = false;
+        // controls.autoRotateSpeed = 1;
+        // controls.maxPolarAngle = Math.PI/2;
         // controls.minPolarAngle = 0;
-        controls.maxAzimuthAngle = Math.PI/20;
-        controls.minAzimuthAngle = -Math.PI/20;
-        controls.minDistance = 100;
-        controls.maxDistance = 100;
-        controls.enablePan = false;
-        controls.update();
+        // controls.maxAzimuthAngle = Math.PI/20;
+        // controls.minAzimuthAngle = -Math.PI/20;
+        // controls.minDistance = 100;
+        // controls.maxDistance = 100;
+        // controls.enablePan = false;
+        // controls.update();
 
-        this.vars.threeObj.push(controls);
+        // this.vars.threeObj.push(controls);
     },
     lightThunder: function (color, intensity, distance, decay, posX, posY, posZ) {
         var flash = new THREE.PointLight(color, intensity, distance, decay);
@@ -148,7 +173,7 @@ var parallaxHeader = {
     },
     moveClouds: function() {
         this.vars.cloudParticles.forEach(cloud => {
-        cloud.position.x -= 0.06;
+        cloud.position.x -= 0.02;
         if (cloud.position.x < -200) {
             cloud.rotation.z = Math.random()*360;
             cloud.position.x = 200;
@@ -164,7 +189,7 @@ var parallaxHeader = {
     },
     mainLoop: function() {
         parallaxHeader.moveClouds();
-        parallaxHeader.vars.threeObj[0].update();
+        // parallaxHeader.vars.threeObj[0].update();
         parallaxHeader.vars.renderer.render(parallaxHeader.vars.scene, parallaxHeader.vars.camera);
         requestAnimationFrame(parallaxHeader.mainLoop);
     },
@@ -172,12 +197,15 @@ var parallaxHeader = {
         var $that = this;
         window.addEventListener( 'resize', $that.onWindowResize, false );
         document.addEventListener( 'wheel', $that.onMouseWheel, false);
+        document.onmousemove = this.onMouseMove;
+        window.addEventListener('deviceorientation', $that.mobileTilt ) ;
+        // if (window.DeviceOrientationEvent) { window.addEventListener('deviceorientation', function(e) { $that.mobileTilt } ) };
     },
     init: function () {
         this.renderInit();
         this.cameraInit();
         this.lightPoint(0xffffff, 1, 1000, 0, 1, 1, 100);
-        this.lightThunder(0xffffff, 30, 500, 1.7, 0, 0, 0);
+        this.lightThunder(0xffffff, 30, 500, 1.7, 0, 0, -5);
         this.imagesLoad();
         this.fontLoad(this.vars.textFont2, this.vars.text1, 9, -100, 30, 3);
         this.fontLoad(this.vars.textFont2, this.vars.text2, 9, 22, 13, 6);
