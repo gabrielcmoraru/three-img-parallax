@@ -120,12 +120,6 @@ var parallaxHeader = {
             txt.rotation.x = (e.clientY - centerY) / centerY * parallaxHeader.vars.mouseTolerance;
         })
     },
-    mobileTilt: function (e) {
-        console.log(e)
-        update('x', e.beta);
-        update('y', e.gamma);
-        update('z', e.alpha ? 360 - e.alpha : null);
-    },
     onWindowResize: function () {
         parallaxHeader.vars.camera.aspect = window.innerWidth / window.innerHeight;
         parallaxHeader.vars.camera.updateProjectionMatrix();
@@ -198,7 +192,6 @@ var parallaxHeader = {
         window.addEventListener( 'resize', $that.onWindowResize, false );
         document.addEventListener( 'wheel', $that.onMouseWheel, false);
         document.onmousemove = this.onMouseMove;
-        window.addEventListener('deviceorientation', $that.mobileTilt ) ;
         // if (window.DeviceOrientationEvent) { window.addEventListener('deviceorientation', function(e) { $that.mobileTilt } ) };
     },
     init: function () {
