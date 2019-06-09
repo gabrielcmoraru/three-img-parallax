@@ -1,12 +1,12 @@
 var THREE = window.THREE = require('three');
 var Stats = require('stats-js');
-// var OrbitControls = require('three-orbit-controls')(THREE);
 
 var parallaxHeader = {
     vars: {
         threeObj: [],
         threeImg: [],
         threeTxt: [],
+        threeSun: [],
         cloudParticles: [],
         flashObj: [],
         scene: new THREE.Scene(),
@@ -18,6 +18,10 @@ var parallaxHeader = {
         mouseTolerance: 0.02,
         thundeTime: 0,
         fps: new Stats(),
+        clock: new THREE.Clock,
+        sunR: 500,
+        sunTheta: 0,
+        sunDTheta: 2 * Math.PI / 1000,
         cloudTexture: "src/img/cloud.png",
         textFont: 'src/fonts/criteria-thin.json',
         textFont2: 'src/fonts/flexo.json',
@@ -51,6 +55,8 @@ var parallaxHeader = {
             var mesh = new THREE.Mesh( textGeometry, textMaterial);
             mesh.position.set(posX,posY,posZ);
             mesh.name = `text-${textContent}`;
+            mesh.castShadow = true;
+            mesh.receiveShadow = false;
             $that.vars.textGroup.add(mesh);
         });
         this.vars.scene.add(this.vars.textGroup);
@@ -84,9 +90,7 @@ var parallaxHeader = {
             });
             for(let i=0; i<10; i++) {
                 let cloud = new THREE.Mesh(cloudGeo,cloudMaterial);
-                cloud.position.set((Math.random()*300-100), 80, (-i-50));
-                // cloud.rotation.x = Math.random()*100;
-                // cloud.rotation.y = Math.random()*360;
+                cloud.position.set((Math.random()*300-100), $that.minMax(90, 150), (-i-50));
                 cloud.rotation.z = Math.random()*360;
                 cloud.name = `cloud-${i}`;
                 cloud.material.opacity = 0.5;
@@ -154,28 +158,7 @@ var parallaxHeader = {
         parallaxHeader.vars.renderer.setSize( window.innerWidth, window.innerHeight );
     },
     cameraInit: function () {
-        // create an locate the camera
-        // camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        // var controls = new OrbitControls( this.vars.camera );
-
         this.vars.camera.position.z = 100;
-        // this.vars.camera.position.set(140, 120, -140);
-        // center = new THREE.Vector3();
-        // center.z = -50;
-        // controls.enableDamping = true;
-        // controls.dampingFactor = 0.9;
-        // controls.autoRotate = false;
-        // controls.autoRotateSpeed = 1;
-        // controls.maxPolarAngle = Math.PI/2;
-        // controls.minPolarAngle = 0;
-        // controls.maxAzimuthAngle = Math.PI/20;
-        // controls.minAzimuthAngle = -Math.PI/20;
-        // controls.minDistance = 100;
-        // controls.maxDistance = 100;
-        // controls.enablePan = false;
-        // controls.update();
-
-        // this.vars.threeObj.push(controls);
     },
     lightThunder: function (color, intensity, distance, decay, posX, posY, posZ) {
         var flash = new THREE.PointLight(color, intensity, distance, decay);
@@ -188,7 +171,14 @@ var parallaxHeader = {
         light.position.set(posX, posY, posZ);
         this.vars.scene.add(light);
     },
+    lightSun: function (color, intensity, distance, decay, posX, posY, posZ ) {
+        var sun = new THREE.PointLight(color, intensity, distance, decay);
+        sun.position.set(posX, posY, posZ);
+        this.vars.scene.add( sun );
+        this.vars.threeSun.push( sun );
+     },
     renderInit: function () {
+        this.vars.scene.background = new THREE.Color( '#7ec0ee' );
         this.vars.renderer.setSize(window.innerWidth, window.innerHeight);
         this.vars.renderer.setPixelRatio( window.devicePixelRatio );
         document.body.appendChild(this.vars.renderer.domElement);
@@ -206,6 +196,11 @@ var parallaxHeader = {
         }
         });
     },
+    moveSun: function () {
+        this.vars.sunTheta += this.vars.sunDTheta;
+        this.vars.threeSun[0].position.z = this.vars.sunR *  Math.cos(this.vars.sunTheta);
+        this.vars.threeSun[0].position.x = (this.vars.sunR *  Math.cos(this.vars.sunTheta))/1000;
+    },
     callThunder: function () {
         this.vars.flashObj[0].position.set( this.minMax(50, 400), this.minMax(300, 600), 100 );
         this.vars.flashObj[0].power = this.minMax(100, 1000);
@@ -217,6 +212,7 @@ var parallaxHeader = {
     mainLoop: function() {
         parallaxHeader.vars.fps.update();
         parallaxHeader.moveClouds();
+        parallaxHeader.moveSun();
         parallaxHeader.vars.renderer.render(parallaxHeader.vars.scene, parallaxHeader.vars.camera);
         requestAnimationFrame(parallaxHeader.mainLoop);
     },
@@ -226,14 +222,13 @@ var parallaxHeader = {
         document.addEventListener( 'wheel', $that.onMouseWheel, false);
         document.addEventListener( 'click', $that.onMouseClick, false);
         document.onmousemove = this.onMouseMove;
-
-        // if (window.DeviceOrientationEvent) { window.addEventListener('deviceorientation', function(e) { $that.mobileTilt } ) };
     },
     init: function () {
         this.renderInit();
         this.cameraInit();
         this.lightPoint(0xffffff, 1, 1000, 0, 1, 1, 100);
         this.lightThunder(0xffffff, 30, 500, 1.7, 0, 0, -5);
+        this.lightSun('#FDB813', 1.5*Math.PI, 250, 2, -1000, 150, 1000);
         this.callThunder();
         this.imagesLoad();
         this.fontLoad(this.vars.textFont2, this.vars.text1, 9, -100, 30, 3);
@@ -242,8 +237,6 @@ var parallaxHeader = {
         this.cloudLoad(this.vars.cloudTexture, 50, 100);
         this.evenListeners();
         this.showFPS();
-        console.log(this.vars.threeImg)
-        console.log(this.vars.threeObj)
     }
 }
 
