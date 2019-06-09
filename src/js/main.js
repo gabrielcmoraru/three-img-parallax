@@ -70,7 +70,7 @@ var parallaxHeader = {
             var material = new THREE.MeshLambertMaterial({
                 map: this.vars.imgLoader.load('src/img/layer-0' + i + '.png')
             });
-            var geometry = new THREE.PlaneGeometry(280 +(i*3) , 200 +(i*3) , 30, 30);
+            var geometry = new THREE.PlaneGeometry(300 +(i*3) , 200 +(i*3) , 30, 30);
             var mesh = new THREE.Mesh(geometry, material);
             mesh.material.transparent = true;
             mesh.name = `imagelayer-${i}`;
